@@ -54,6 +54,16 @@ spec:
             type: object
           status:
             description: HttpStatusPollerStatus defines the observed state of HttpStatusPoller
+            properties:
+              statusCodes:
+                additionalProperties:
+                  type: integer
+                description: |-
+                  StatusCodes tracks the HTTP return code of the checked URLs or -1 if
+                  the URL can't be reached
+                type: object
+            required:
+            - statusCodes
             type: object
         type: object
     served: true

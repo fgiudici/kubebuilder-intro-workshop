@@ -28,8 +28,13 @@ type HttpStatusPollerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of HttpStatusPoller. Edit httpstatuspoller_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// URLs is a slice containing the URLs to check
+	// +kubebuilder:validation:MinItems=1
+	URLs []string `json:"urls"`
+
+	// IntervalSeconds specifies how many seconds to wait between subsequent checks
+	// +optional
+	IntervalSeconds int `json:"intervalSeconds,omitempty"`
 }
 
 // HttpStatusPollerStatus defines the observed state of HttpStatusPoller

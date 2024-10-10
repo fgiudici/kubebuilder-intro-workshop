@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -80,17 +81,22 @@ func pollURLs(ctx context.Context, urls []string) map[string]int {
 	log := log.FromContext(ctx)
 
 	result := make(map[string]int)
+	http.DefaultClient.Timeout = 2 * time.Second
 
-	for _, url := range urls {
-		resp, err := http.Get(url)
+	for _, u := range urls {
+		resp, err := http.Get(u)
 		if err != nil {
-			log.Error(err, "Failed to poll URL", "url", url)
-			result[url] = -1
+			if err.(*url.Error).Timeout() {
+				log.Info("URL is unreachable", "url", u)
+			} else {
+				log.Error(err, "Failed to poll URL", "url", u)
+			}
+			result[u] = -1
 			continue
 		}
 		defer resp.Body.Close()
-
-		result[url] = resp.StatusCode
+		log.Info("URL is reachable", "url", u, "HTTP Status code", resp.Status)
+		result[u] = resp.StatusCode
 	}
 
 	return result

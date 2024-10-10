@@ -1,0 +1,27 @@
+# permissions for end users to edit httpstatuspollers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: workshop
+    app.kubernetes.io/managed-by: kustomize
+  name: httpstatuspoller-editor-role
+rules:
+- apiGroups:
+  - healthchecker.cattle.io
+  resources:
+  - httpstatuspollers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - healthchecker.cattle.io
+  resources:
+  - httpstatuspollers/status
+  verbs:
+  - get

@@ -1,0 +1,23 @@
+# permissions for end users to view httpstatuspollers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: workshop
+    app.kubernetes.io/managed-by: kustomize
+  name: httpstatuspoller-viewer-role
+rules:
+- apiGroups:
+  - healthchecker.cattle.io
+  resources:
+  - httpstatuspollers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - healthchecker.cattle.io
+  resources:
+  - httpstatuspollers/status
+  verbs:
+  - get

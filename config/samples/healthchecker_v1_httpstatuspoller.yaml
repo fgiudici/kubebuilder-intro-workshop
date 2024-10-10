@@ -1,0 +1,9 @@
+apiVersion: healthchecker.cattle.io/v1
+kind: HttpStatusPoller
+metadata:
+  labels:
+    app.kubernetes.io/name: workshop
+    app.kubernetes.io/managed-by: kustomize
+  name: httpstatuspoller-sample
+spec:
+  # TODO(user): Add fields here

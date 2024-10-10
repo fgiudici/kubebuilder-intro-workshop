@@ -18,6 +18,8 @@ package controller
 
 import (
 	"context"
+	"net/http"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -49,9 +51,49 @@ type HttpStatusPollerReconciler struct {
 func (r *HttpStatusPollerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	httpStatusPoller := &healthcheckerv1.HttpStatusPoller{}
+	if err := r.Get(ctx, req.NamespacedName, httpStatusPoller); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
-	return ctrl.Result{}, nil
+	patch := client.MergeFrom(httpStatusPoller.DeepCopy())
+
+	// Poll the URLs specified in the CR
+	result := pollURLs(ctx, httpStatusPoller.Spec.URLs)
+
+	// Update the status of the CR with the results of the polling
+	httpStatusPoller.Status.StatusCodes = result
+
+	if err := r.Status().Patch(ctx, httpStatusPoller, patch); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	pollingInterval := time.Duration(httpStatusPoller.Spec.IntervalSeconds) * time.Second
+	if httpStatusPoller.Spec.IntervalSeconds == 0 {
+		pollingInterval = time.Minute
+	}
+
+	return ctrl.Result{RequeueAfter: pollingInterval}, nil
+}
+
+func pollURLs(ctx context.Context, urls []string) map[string]int {
+	log := log.FromContext(ctx)
+
+	result := make(map[string]int)
+
+	for _, url := range urls {
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Error(err, "Failed to poll URL", "url", url)
+			result[url] = -1
+			continue
+		}
+		defer resp.Body.Close()
+
+		result[url] = resp.StatusCode
+	}
+
+	return result
 }
 
 // SetupWithManager sets up the controller with the Manager.

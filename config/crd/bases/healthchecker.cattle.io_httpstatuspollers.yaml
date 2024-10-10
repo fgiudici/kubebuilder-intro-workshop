@@ -39,10 +39,18 @@ spec:
           spec:
             description: HttpStatusPollerSpec defines the desired state of HttpStatusPoller
             properties:
-              foo:
-                description: Foo is an example field of HttpStatusPoller. Edit httpstatuspoller_types.go
-                  to remove/update
-                type: string
+              intervalSeconds:
+                description: IntervalSeconds specifies how many seconds to wait between
+                  subsequent checks
+                type: integer
+              urls:
+                description: URLs is a slice containing the URLs to check
+                items:
+                  type: string
+                minItems: 1
+                type: array
+            required:
+            - urls
             type: object
           status:
             description: HttpStatusPollerStatus defines the observed state of HttpStatusPoller

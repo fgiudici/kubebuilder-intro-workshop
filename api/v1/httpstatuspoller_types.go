@@ -41,6 +41,10 @@ type HttpStatusPollerSpec struct {
 type HttpStatusPollerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// StatusCodes tracks the HTTP return code of the checked URLs or -1 if
+	// the URL can't be reached
+	StatusCodes map[string]int `json:"statusCodes"`
 }
 
 // +kubebuilder:object:root=true

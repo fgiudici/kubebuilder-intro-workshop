@@ -1,0 +1,9 @@
+apiVersion: healthchecker.cattle.io/v1
+kind: HttpStatusPoller
+metadata:
+  name: test
+spec:
+  urls:
+  - https://www.google.com
+  - https://1.2.3.4
+  - https://dont.exist
